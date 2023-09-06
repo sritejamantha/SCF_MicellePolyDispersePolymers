@@ -1,0 +1,24 @@
+CFLAGS= -Wall #-ansi -pedantic -Wshadow -Wundef -Wcast-align -Wpointer-arith -O3 -D_XOPEN_SOURCE=600
+
+CPPLAGS= -Wall -I/fs01/ma03/homes/smantha/UTIL/fftw3/include -I/fs01/ma03/homes/smantha/UTIL/gsl/include
+
+LDLIBS = -L/fs01/ma03/homes/smantha/UTIL/fftw3/lib -L/fs01/ma03/homes/smantha/UTIL/gsl/lib -lfftw3 -lgsl -lgslcblas -lm -Wall
+CC=gcc
+
+SRC=$(wildcard *.c)
+
+OBJ=$(patsubst %c,%o,$(SRC) )
+
+out: $(OBJ)
+	gcc  $^ $(LDLIBS) -o $@
+
+include $(SRC:.c=.d)
+
+%.d: %.c
+	set -e; rm -f $@; \
+	gcc -MM $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@:,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+clean:
+	rm -f *.o *.d out
